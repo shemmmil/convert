@@ -1,15 +1,17 @@
-import { Telegraf, Format, Context } from "telegraf";
+import { Telegraf, Context } from "telegraf";
 import { getDailyRate } from "../rate";
 import { Salary } from "../salary";
 import { Update } from "telegraf/types";
 
-const CHAT_ID = 238923775;
-
+const CHAT_ID = Number(process.env.CHAT_ID);
 export class TelegramBot {
   private bot: Telegraf<Context<Update>>;
 
   constructor() {
-    this.bot = new Telegraf("5991422371:AAG2V4jkVvv_8VL_hAWnGCWL_uCJLlNFjss");
+    if (!process.env.BOT_TOKEN) {
+      throw new Error("TELEGRAM_BOT_TOKEN must be provided!");
+    }
+    this.bot = new Telegraf(process.env.BOT_TOKEN);
   }
 
   async start() {
