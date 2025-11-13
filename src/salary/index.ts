@@ -3,11 +3,13 @@ import fx from "money";
 import { DailyRate } from "../rate/type";
 
 export class Salary {
-  private salarayInTenge: number = parseInt(process.env.SALARY ?? "0", 10);
+  private salarayInTenge: number;
 
-  constructor(rate: DailyRate) {
+  constructor(rate: DailyRate, salarayInTenge: number) {
     fx.base = rate.base;
     fx.rates = rate.rates;
+
+    this.salarayInTenge = salarayInTenge;
   }
 
   getSalaryInRub() {
@@ -62,5 +64,29 @@ export class Salary {
         currency: "RUB",
       }).format(vatSum),
     ];
+  }
+
+  getSalaryInRubNumeric() {
+    return fx(this.salarayInTenge).from("KZT").to("RUB");
+  }
+
+  getSalaryInUsdNumeric() {
+    return fx(this.salarayInTenge).from("KZT").to("USD");
+  }
+
+  getSalaryWithVATNumeric() {
+    const currentRate = Number(
+      this.salarayInTenge / fx(this.salarayInTenge).from("KZT").to("RUB")
+    ).toFixed(2);
+
+    const vat = parseFloat(process.env.VAT ?? "0");
+    const rateWithVat = Number(currentRate) + vat;
+    const salaryWithVat = this.salarayInTenge / rateWithVat;
+
+    const amoutSalaryInRub = fx(this.salarayInTenge).from("KZT").to("RUB");
+
+    const vatSum = amoutSalaryInRub - salaryWithVat;
+
+    return [salaryWithVat, vatSum];
   }
 }

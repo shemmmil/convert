@@ -5,6 +5,7 @@ dotenv.config();
 
 export const main = async () => {
   const telegramBot = new TelegramBot();
+
   telegramBot.start();
   telegramBot.sendSalaryMessage();
 };
